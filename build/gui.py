@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 # Função para o botão Voltar
 def voltar():
@@ -10,10 +11,7 @@ root.title("Histórico de Conversão de Moeda")
 root.geometry("1070x300")
 root.configure(bg="#F9F2ED")
 
-
-
 # Construção do Header da tela de historico
-
 # Criação do frame de cabeçalho
 header = tk.Frame(root, bg="#F9F2ED", width=1055, height=72)
 header.pack(fill=tk.X)
@@ -27,33 +25,36 @@ btn_voltar = tk.Button(header, text="Voltar", bg="#FFA500", fg="#ffffff", font=(
 btn_voltar.place(x=900, y=7.5, width=137, height=57)  # Posição e tamanho do botão
 
 # ================================================================
-# criação das labels de cabeçalho
-container_label = tk.Frame(root, bg="#FFFFFF", width=1055, height=50, border=1, relief="flat", highlightbackground="#000000", highlightthickness=1)
-container_label.pack(fill=tk.X)
+# criação da tabela de histórico
+# Criando o frame para a tabela
+container_tabela = tk.Frame(root, bg="#FFFFFF", width=1055, height=200)
+container_tabela.pack(fill=tk.BOTH, expand=True)
 
-# Definindo os labels de cabeçalho
-labels = ["Moeda de Origem", "Moeda de Destino", "Taxa de Câmbio", "Valor a Converter", "Resultado final"]
+# Definindo as colunas da tabela
+colunas = ("origem", "destino", "taxa", "valor", "resultado")
 
-# Número total de colunas (labels + separadores)
-num_columns = len(labels) * 2 - 1
+# Estilo do Treeview
+style = ttk.Style()
+style.configure("Custom.Treeview", background="#FFFFFF", foreground="#000000", fieldbackground="#1F1F1F")
+style.map("Custom.Treeview", background=[("selected", "#FFA500")], foreground=[("selected", "white")])
 
-# Largura de cada coluna (espaço disponível / número de colunas)
-column_width = 1055 // num_columns
+# Criando o Treeview
+tree = ttk.Treeview(container_tabela, columns=colunas, show="headings", style="Custom.Treeview")
+tree.pack(fill=tk.BOTH, expand=True)
 
-for i, text in enumerate(labels):
-    label = tk.Label(container_label, text=text, bg="#FFFFFF", width=column_width // 10)
-    label.grid(row=0, column=2 * i, sticky="nsew")
+# Definindo os cabeçalhos das colunas
+tree.heading("origem", text="Moeda de Origem")
+tree.heading("destino", text="Moeda de Destino")
+tree.heading("taxa", text="Taxa de Câmbio")
+tree.heading("valor", text="Valor a Converter")
+tree.heading("resultado", text="Resultado final")
 
-    
-
-# Ajustando a largura das colunas no grid
-for i in range(num_columns):
-    container_label.grid_columnconfigure(i, minsize=column_width)
-
-# ================================================================
-# criação do frame para os dados
-container_dados = tk.Frame(root, bg="#FFFFFF", width=1055, height=200)
-container_dados.pack(fill=tk.X)
+# Definindo a largura das colunas
+tree.column("origem", width=200)
+tree.column("destino", width=200)
+tree.column("taxa", width=150)
+tree.column("valor", width=150)
+tree.column("resultado", width=150)
 
 # Dados do histórico de conversão de moedas
 historico = [
@@ -91,15 +92,9 @@ historico = [
     ["GBP", "JPY", "140.50", "100.00", "14050.00"],
     ["JPY", "USD", "0.0097", "8000.00", "77.60"]
 ]
-# Adicionando os dados ao container_dados
-for row_index, row_data in enumerate(historico):
-    for col_index, data in enumerate(row_data):
-        label = tk.Label(container_dados, text=data, bg="#FFFFFF", width=column_width // 10)
-        label.grid(row=row_index, column=2 * col_index, sticky="nsew")
 
-
-# Ajustando a largura das colunas no grid
-for i in range(num_columns):
-    container_dados.grid_columnconfigure(i, minsize=column_width)
+# Adicionando os dados ao Treeview
+for row in historico:
+    tree.insert("", "end", values=row)
 
 root.mainloop()
